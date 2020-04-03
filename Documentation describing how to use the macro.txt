@@ -1,0 +1,17 @@
+You can download the SGF 2020 paper which describes detail about the macro:
+
+A SAS® Macro for Calibration of Survey Weights
+Tony An, PhD 
+SAS Institute Inc.
+
+ABSTRACT
+In survey sampling, calibration is commonly used for adjusting weights to ensure that estimates for covariates in the
+sample match known auxiliary information, such as marginal totals from census data. Calibration can also be used to
+adjust for unit nonresponse. This paper discusses a macro for calibration that was developed using SAS/STAT® 15.1
+and SAS/IML® software. The macro enables you to input the design information, the controls for the auxiliary variables,
+and your preferred calibration method, including either a linear or exponential method. Because an unbounded
+calibration method can result in extreme calibration weights, this macro also supports bounded versions of both linear
+and exponential calibration methods. The macro creates calibration replication weights according to the sample
+design and the specified calibration method. Examples are given to illustrate how to use the macro.
+
+https://www.sas.com/content/dam/SAS/support/en/sas-global-forum-proceedings/2020/4284-2020.pdf
