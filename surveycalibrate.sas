@@ -1607,6 +1607,5 @@ ods listing;
 
     ods graphics on;
     ods listing;
-    OPTIONS NOTES errors=MAX MERGENOBY=ERROR;
 %mend SurveyCalibrate;
 
