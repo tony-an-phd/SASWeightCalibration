@@ -1354,7 +1354,7 @@ proc iml;
        data _temp_; merge _temp_ _tmpnewwt_;
        data &out; merge &out _temp_; by _obs_; 
    %end;
-   %goto CALREPWTS_LOGIT;  
+   %goto EXIT;  
 
 %CALREPWTS_TRUNLINEAR:
    %if (&success=0) %then %goto EXIT;
