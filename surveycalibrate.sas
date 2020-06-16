@@ -29,7 +29,9 @@ specified calibration method.
 
 ---------------------------------------------------------------------*/
 
-OPTIONS NONOTES errors=0;
+
+
+OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
 %macro SurveyCalibrate(
    DATA=,      /* Input data set name                                        */
    OUT=,       /* Output data set name                                       */
@@ -319,8 +321,8 @@ proc iml;
   read all var {&controlVar} into x;
   close _temp_&data; 
   T={&ctrltotal}`; 
-  dW=diag(w); 
-  beta=ginv(X`*dW*X)*(T-X`*w);
+  wx=w#x; 
+  beta=ginv(X`*wx)*(T-X`*w);
   CalW=w+w#(X*beta);
   minCalWValue=min(CalW);
   if (minCalWValue<0)then
@@ -368,8 +370,8 @@ proc iml;
    read all var {&controlVar} into x;
    close _temp_&data; 
    T={&ctrltotal}`; 
-   dW=diag(w); 
-   beta=ginv(X`*dW*X)*(T-X`*w);
+   wx=w#x; 
+   beta=ginv(X`*wx)*(T-X`*w);
    CalW=w+w#(X*beta);
    minCalWValue=min(CalW);
    if (minCalWValue<0)then
@@ -1343,8 +1345,8 @@ proc iml;
              read all var {&controlVar} into x;
              close _temp_; 
              T={&ctrltotal}`; 
-             dW=diag(w); 
-             beta=ginv(X`*dW*X)*(T-X`*w);
+             wx=w#x; 
+             beta=ginv(X`*wx)*(T-X`*w);
              CalW=w+w#(X*beta);
              create _tmpnewwt_ from CalW[colname="&repwtPrefix&i"];
              append from CalW;
@@ -1605,5 +1607,6 @@ ods listing;
 
     ods graphics on;
     ods listing;
+    OPTIONS NOTES errors=MAX MERGENOBY=ERROR;
 %mend SurveyCalibrate;
 
