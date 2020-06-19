@@ -1,4 +1,4 @@
-%inc SurveyCalibrte;
+%inc surveycalibrate;
 data Mortality;
    input ID VarStrata VarPSU SWeight Age VitalStatus PovArInd Gender;
 

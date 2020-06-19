@@ -1325,7 +1325,7 @@ proc iml;
    call symputx('printiter', iter);
    call symputx('maxIterReached', maxIterReached);
    call symputx('success', success);
-%goto EXIT;  
+%goto CALREPWTS_LOGIT;  
 /* end of LU_LOGIT method */
 
 /* create replicate weights */
