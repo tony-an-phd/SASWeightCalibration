@@ -325,12 +325,26 @@ proc iml;
   beta=ginv(X`*wx)*(T-X`*w);
   CalW=w+w#(X*beta);
   minCalWValue=min(CalW);
+  *print minCalWValue;
   if (minCalWValue<0)then
     negtiveCalW=1;
     start expodist(v) global(w);
-      y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
-      f=sum(y);
-      return(f);
+       weps = 1e-4;
+       verybig= weps**(log(weps)-1);
+       f=0;
+       do i = 1 to nrow(w);
+       if (w > weps) then
+          vdw = v[i]/w[i];
+       else 
+          vdw = v[i]/weps;
+       if (vdw > weps) then
+          fi = 1 + vdw**(log(vdw) - 1);
+       else 
+          fi = verybig;  
+       f=f+fi;
+       end; 
+       /* y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1))); */
+       return(f);
     finish expodist;
     /* if have negative weights, use exponential */
     if (negtiveCalW=1) then 
@@ -354,11 +368,8 @@ proc iml;
   append from CalW;
   call symputx('negtiveCalW', negtiveCalW);
   call symputx('switchToExp', switchToExp);
-  if (minCalWValue<0)
-     %goto CALREPWTS_LOGIT;
-  else 
-     %goto CALREPWTS_LINEAR;
-     
+  quit;
+  %goto CALREPWTS_LINEAR;
 /* end NONE method */
 
 /* LINEAR method */
@@ -873,9 +884,23 @@ proc iml;
    blc  = constrain;
    
    start dist(v) global(w);
-      y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
+      weps = 1e-4;
+      verybig= weps**(log(weps)-1);
+      f=0;
+      do i = 1 to nrow(w);
+      if (w > weps) then
+         vdw = v[i]/w[i];
+      else 
+         vdw = v[i]/weps;
+      if (vdw > weps) then
+         fi = 1 + vdw**(log(vdw) - 1);
+      else 
+         fi = verybig;  
+      f=f+fi;
+      end; 
+/* y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1))); 
       *print y;
-      f=sum(y);
+      f=sum(y); */
       return(f);
    finish dist;
  
@@ -905,9 +930,23 @@ proc iml;
    blc  = constrain;
    
    start dist(v) global(w);
-      y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
+      weps = 1e-4;
+      verybig= weps**(log(weps)-1);
+      f=0;
+      do i = 1 to nrow(w);
+      if (w > weps) then
+         vdw = v[i]/w[i];
+      else 
+         vdw = v[i]/weps;
+      if (vdw > weps) then
+         fi = 1 + vdw**(log(vdw) - 1);
+      else 
+         fi = verybig;  
+      f=f+fi;
+      end;
+      /*y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
       *print y;
-      f=sum(y);
+      f=sum(y); */
       return(f);
    finish dist;
 
@@ -949,9 +988,23 @@ proc iml;
    w0=w;
    
    start dist(v) global(w);
-      y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
+      weps = 1e-4;
+      verybig= weps**(log(weps)-1);
+      f=0;
+      do i = 1 to nrow(w);
+      if (w > weps) then
+         vdw = v[i]/w[i];
+      else 
+         vdw = v[i]/weps;
+      if (vdw > weps) then
+         fi = 1 + vdw**(log(vdw) - 1);
+      else 
+         fi = verybig;  
+      f=f+fi;
+      end;
+      /* y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
       *print y;
-      f=sum(y);
+      f=sum(y); */
       return(f);
    finish dist;
 
@@ -969,7 +1022,6 @@ proc iml;
    multiplier=0.5;
    ll=&lower; uu=&upper;
    /*  initial */      
-
    rc=fitwithbound(ll, uu); 
    initialL=&lower; initialU=&upper; finalrc=0;
    lastll=ll;
@@ -984,10 +1036,11 @@ proc iml;
    iter=0; 
    max=ll<>lastll;
    min=ll><lastll;
-
+    
+   *print "going to search lower bound";
+   *print ll uu iter rc;
    do while (continue=1 & success=1);      
      *print iter success ll uu optn blc w;
-
      rc=fitwithbound(ll, uu); 
      if (rc<=0) then absolutebound=absolutebound><ll;
      temp=ll;
@@ -1057,19 +1110,23 @@ proc iml;
    w0=w;
    
    start dist(v) global(w);
-      /* when v has value of 0, log(v/w) is suffering 
-      r=ncol(v); 
-      i=1;
-      do while (i<=r);
-        e=v[i];
-        if (e<=0) then v[i]=1e-3;
-        i=i+1;
+      weps = 1e-4;
+      verybig= weps**(log(weps)-1);
+      f=0;
+      do i = 1 to nrow(w);
+      if (w > weps) then
+         vdw = v[i]/w[i];
+      else 
+         vdw = v[i]/weps;
+      if (vdw > weps) then
+         fi = 1 + vdw**(log(vdw) - 1);
+      else 
+         fi = verybig;  
+      f=f+fi;
       end;
-      ww=w`;
-      print v ww; */
-      y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
+      /* y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
       *print y;
-      f=sum(y);
+      f=sum(y); */
       return(f);
    finish dist;
 
@@ -1183,9 +1240,23 @@ proc iml;
    blc  = constrain;
    w0 = w;
    start dist(v) global(w);
-      y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
+      weps = 1e-4;
+      verybig= weps**(log(weps)-1);
+      f=0;
+      do i = 1 to nrow(w);
+      if (w > weps) then
+         vdw = v[i]/w[i];
+      else 
+         vdw = v[i]/weps;
+      if (vdw > weps) then
+         fi = 1 + vdw**(log(vdw) - 1);
+      else 
+         fi = verybig;  
+      f=f+fi;
+      end;    
+      /*y = (J(1, nrow(w), 1))+ (v/w`)##((log(v/w`)-J(1, nrow(w), 1)));
       *print y;
-      f=sum(y);
+      f=sum(y); */
       return(f);
    finish dist;
 
@@ -1209,6 +1280,8 @@ proc iml;
    lastuu=uu;
    lastrc=rc;
 
+   *print "before searching upper bound";
+   *print initialL initialU ll uu lastuu rc;  
    if (rc<=0) then 
    do;
      uu=(1+multiplier)*lastuu; 
@@ -1217,6 +1290,9 @@ proc iml;
 
    if (rc>0) then
      uu=multiplier*lastuu<>absolutebound; 
+
+   *print "going to search upper bound";
+   *print absolutebound uu lastuu;  
 
    continue=1;
    iter=0;
@@ -1261,8 +1337,6 @@ proc iml;
       end;
    end; /* end of do while (continue=1); for looking for upper bound */
 
-   *print "before searching lower bound";
-   *print ll uu iter rc; 
    printiterl=iter;
    /* now search for a lower bound */
    if (success=1) then do;
@@ -1272,8 +1346,12 @@ proc iml;
      absolutebound=1;
      ll=lastll+multiplier*(absolutebound-lastll);  /* lastll should be 0.01 and rc>0 */
      continue=1;
+     
+     *print "before searching lower bound";
+     *print ll uu iter rc; 
      do while (continue=1);      
        rc=fitwithbound(ll, uu);
+       if (rc<=0) then absolutebound=absolutebound><ll;
        *print rc; 
        temp=ll;
        max=ll<>lastll;
@@ -1291,7 +1369,7 @@ proc iml;
        ll=ll><absolutebound;
        lastll=temp;
        lastrc=rc;
-       *print iter rc lastrc ll uu lastuu min max absolutebound diff;
+       *print iter rc lastrc ll uu lastll min max absolutebound diff;
        if (diff<&eps & rc>0) then do;
          ll=lastll;
          continue=0;
@@ -1331,6 +1409,8 @@ proc iml;
 /* create replicate weights */
 %CALREPWTS_LINEAR:
    %if (&success=0) %then %goto EXIT;
+   %if ((&negtiveCalW=1) & (&method=NONE))
+      %then %goto CALREPWTS_LOGIT;
    data &out; merge _temp_&data _tmpnewwt_ ;   
    data &out; merge _obs_&data &out; by _obs_;
    %if (&calRepWt=0) %then %goto EXIT;
