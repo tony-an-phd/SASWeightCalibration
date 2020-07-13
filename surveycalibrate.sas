@@ -29,9 +29,6 @@ specified calibration method.
 
 ---------------------------------------------------------------------*/
 
-
-
-OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
 %macro SurveyCalibrate(
    DATA=,      /* Input data set name                                        */
    OUT=,       /* Output data set name                                       */
@@ -87,7 +84,7 @@ OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
       %goto EXIT;
    %end;
 
-   %if &weight eq %then  %do;
+   %if &weight eq %then %do;
       %put ERROR: No weight variable is specified.;
       %let success=0;
       %goto EXIT;
@@ -128,17 +125,37 @@ OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
    %end;
    %else %do;
       %let method=%upcase(&method); 
-   %end;
-   %if ((&method^=LINEAR) & (&method^=EXPONENTIAL) &
+      %if ((&method^=LINEAR) & (&method^=EXPONENTIAL) &
        (&method^=TRUNLINEAR) & (&method^=LOGIT) 
        & (&method^=NONE)) %then %do;
-      %put ERROR: method=&method is invalid.;
-      %let success=0;
-      %goto EXIT; 
-   %end;
-  
-   %if &maxiter eq %then %let maxiter=50; 
-  
+         %put ERROR: method=&method is invalid.;
+         %let success=0;
+         %goto EXIT; 
+         %end;
+      %end;
+      
+   %if &norepwt ne %then %do;
+      %if ((%upcase(&norepwt)^=TRUE) & (%upcase(&norepwt)^=FALSE)) %then %do;
+         %put ERROR: NOREPWT=&norepwt is invalid macro parameter, it only takes keywords TRUE or FALSE.;
+         %let creatRepWt=0;
+         %let success=0;   
+         %goto EXIT;
+         %end;
+      %if (%upcase(&norepwt)=TRUE) %then %do;
+         %let calRepWt=0;
+         %let creatRepWt=0;
+         %end;
+      %end;
+
+   %if &maxiter ne %then %do;
+      %if (&maxiter<2) %then %do;
+         %put ERROR: MAXITER=&maxiter is too small.;
+         %let success=0;   
+         %goto EXIT;
+         %end;
+      %end;
+   %if &maxiter eq %then %let maxiter=50;      
+
    %let lowerPrivided=0;
    %if &lower eq %then %let lower=&lowestbound;
       %else %do;
@@ -183,12 +200,26 @@ OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
 
    %if ((&method=NONE)|(&method=LINEAR)|(&method=EXPONENTIAL))
      %then %do;
-       %let lower=0;
+       %let lower=1e-4;
        %let upper=.;
      %end;
 
    %if (%upcase(&noint)=TRUE) %then %let ceateIntercept=0;
-     
+
+   %if ((&calRepWt=1)&(&creatRepWt=1)) %then %do;
+       %if ((&varmethod ne ) & (&repweights eq ))
+          %then %let varmethod=%upcase(&varmethod);
+       %if (&varmethod eq ) %then %let varmethod=JK;
+       %if ((&varmethod^=BRR) & (&varmethod^=JK) &
+           (&varmethod^=JACKKNIFE) &
+           (&varmethod^=BOOTSTRAP)) %then %do;
+          %put ERROR: varmethod=&varmethod is invalid.;
+          %let creatRepWt=0;
+          %let success=0;
+          %goto EXIT;
+          %end;
+       %end;
+   
    /* remove missing values, creat intercept */   
    data _obs_&data; set &data;
       _obs_=_n_;
@@ -219,34 +250,25 @@ OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
    %end; 
 
    /* for replication method */
-   %if (%upcase(&norepwt)=TRUE) %then %do;
-      %let creatRepWt=0;
-      %if &repweights eq %then %let calRepWt=0;
-      %end;
-      
-   %let repwtPrefix=RepWt_;
-   %if &repweights ne %then %do;
-      %let creatRepWt=0;
-      %let repwtPrefix=&repweights;
-      %end;
-   %if (&creatRepWt=1) %then %do;
-      %if &varmethod eq %then %let varmethod=JK;
-      %else %let varmethod=%upcase(&varmethod); 
-      %if ((&varmethod^=BRR) & (&varmethod^=JK) &
-           (&varmethod^=JACKKNIFE) & (&varmethod^=BOOTSTRAP)) %then %do;
-         %put ERROR: varmethod=&varmethod is invalid.;
+   %if (&calRepWt=1) %then %do;
+      %let repwtPrefix=RepWt_;
+      %if &repweights ne %then %do;
          %let creatRepWt=0;
+         %let repwtPrefix=&repweights;
          %end;
       %end;
+
+
+        
     /* Create replicate weights  */
     ods listing close;
     %if (&creatRepWt=1) %then %do;
        %if ((&varmethod=JK)|(&varmethod=JACKKNIFE)) %then %do;
-          %if &outjkcoefs ne %then %let outjkcoefs=%str(outjkcoefs=&outjkcoefs);
+          %if (&outjkcoefs ne ) %then %let outjkcoefs=%str(outjkcoefs=&outjkcoefs);
           proc surveymeans data=_temp_&data varmethod=jk(&outjkcoefs outweights=_temp_outrepwts);
           %end;
        %if (&varmethod=BRR) %then %do;
-          %if &fay ne %then %let fay=%str(fay=&fay);
+          %if (&fay ne ) %then %let fay=%str(fay=&fay);
           proc surveymeans data=_temp_&data varmethod=brr(&fay outweights=_temp_outrepwts);
           %end;
        %if (&varmethod=BOOTSTRAP) %then %do;
@@ -273,7 +295,7 @@ OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
        data _temp_varestsummary; set _temp_varestsummary; 
             if (label1 ^= 'Number of Replicates') then delete; 
                 call symputx('nReps', cValue1);
-        run;
+       run;
      ods listing close; 
      /*%put ******* the total number of replicates=&nReps;
      proc print data=_temp_varestsummary; run; */
@@ -281,7 +303,7 @@ OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
      run;
      %end;
      /* user provided replicate weights */
-     %if (&creatRepWt=0)& (&repweights ne ) %then %do;
+     %if ((&creatRepWt=0) & (&calRepWt=1)) %then %do;
         proc surveymeans data=_temp_&data varmethod=&varmethod;
         var _obs_;
         repweights &repweights:;
@@ -297,7 +319,9 @@ OPTIONS NONOTES errors=0 MERGENOBY=NOWARN ;
                 call symputx('nReps', cValue1);
         run;
         %end;
-      
+
+OPTIONS errors=0 MERGENOBY=NOWARN ;
+
    %if ((&method=TRUNLINEAR)|(&method=LOGIT))
       %then %do;
          %if ((&upperBSearchNeeded=1) & (&lowerBSearchNeeded=1))
@@ -904,7 +928,7 @@ proc iml;
       return(f);
    finish dist;
  
-   l=0; u=.;
+   l=&lower; u=&upper;
    lbound=l*w`|| {. .};  
    ubound=u*w`|| {. .};
    bound=lbound//ubound; 
@@ -1536,7 +1560,7 @@ proc iml;
    data &out; merge _temp_&data _tmpnewwt_ ;   
    data &out; merge _obs_&data &out; by _obs_;
    %if (&calRepWt=0) %then %goto EXIT;
-   %do i=1 %to &nReps; 
+   %do i=1 %to &nReps;
        %let thisRepGood=1;
        data _temp_; set &out;
           keep _obs_ &controlvar &repwtPrefix&i ;
@@ -1630,7 +1654,7 @@ proc iml;
 OPTIONS NOTES errors=max; 
 ods listing;
  
-%if (&method=NONE) %then
+%if ((&method=NONE) & (&success=1)) %then
   %do;
     %if (&switchToExp=0) %then 
         %put NOTE: The calibration weights &calwt are created by using the LINEAR method.;
@@ -1641,7 +1665,7 @@ ods listing;
 %if ((&method=LINEAR) & (&negtiveCalW=1)) %then
   %put WARNING: The LINEAR method results negative calibration weights, consider use other methods or do not specify the method= parameter.;
 
-%if (&method=EXPONENTIAL) %then
+%if ((&method=EXPONENTIAL)& (&success=1)) %then
   %put NOTE: The calibration weights &calwt are created by using the EXPONENTIAL method.;
 
 %if ((&maxIterReached=1) & (&success=0)) %then %do;
@@ -1682,7 +1706,7 @@ ods listing;
     %if ((&method=TRUNLINEAR)|(&method=LOGIT)) %then
         %put NOTE: The calibration weights &calwt are created by using the &method method with LOWER=&lower and UPPER=&upper bounds.;
     %if ((&calRepWt=1) & (&badrep>0)) %then 
-        %put WARNING: &&badrep replicates are removed from data set &final because the calibration process over corresponding replicate weights failed.;
+        %put WARNING: &badrep replicates are removed from data set &out because the calibration process over corresponding replicate weights failed.;
 %end;
 
     ods graphics on;
