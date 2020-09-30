@@ -105,11 +105,12 @@ specified calibration method.
    %let nctrlvar=%sysfunc(countw(&controlvar));
    %let nctr=%sysfunc(countw(&ctrltotal));
   
+   /* this prevent the totals to have dicimal 
    %if &nctrlvar ne &nctr %then %do;
       %put ERROR: The number of CONTROLVAR= variables &nctrlvar and the number of CTRLTOTAL= totals &nctr do not match.;
       %let success=0;
       %goto EXIT;
-   %end;
+   %end; */
   
    %if &calwt eq %then %let calwt=Cal_&weight;
   
