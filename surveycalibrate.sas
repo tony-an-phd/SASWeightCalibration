@@ -257,8 +257,6 @@ specified calibration method.
          %let repwtPrefix=&repweights;
          %end;
       %end;
-
-
         
     /* Create replicate weights  */
     ods listing close;
@@ -297,8 +295,7 @@ specified calibration method.
                 call symputx('nReps', cValue1);
        run;
      ods listing close; 
-     /*%put ******* the total number of replicates=&nReps;
-     proc print data=_temp_varestsummary; run; */
+     
      data _temp_&data; merge _temp_&data _temp_outrepwts;
      run;
      %end;
