@@ -352,9 +352,9 @@ proc iml;
     start expodist(v) global(w);
        weps = 1e-4;
        verybig= weps**(log(weps)-1);
-       f=0;
+       f=0; 
        do i = 1 to nrow(w);
-       if (w > weps) then
+       if (w[i] > weps) then
           vdw = v[i]/w[i];
        else 
           vdw = v[i]/weps;
@@ -909,7 +909,7 @@ proc iml;
       verybig= weps**(log(weps)-1);
       f=0;
       do i = 1 to nrow(w);
-      if (w > weps) then
+      if (w[i] > weps) then
          vdw = v[i]/w[i];
       else 
          vdw = v[i]/weps;
@@ -955,7 +955,7 @@ proc iml;
       verybig= weps**(log(weps)-1);
       f=0;
       do i = 1 to nrow(w);
-      if (w > weps) then
+      if (w[i] > weps) then
          vdw = v[i]/w[i];
       else 
          vdw = v[i]/weps;
@@ -1013,7 +1013,7 @@ proc iml;
       verybig= weps**(log(weps)-1);
       f=0;
       do i = 1 to nrow(w);
-      if (w > weps) then
+      if (w[i] > weps) then
          vdw = v[i]/w[i];
       else 
          vdw = v[i]/weps;
@@ -1135,7 +1135,7 @@ proc iml;
       verybig= weps**(log(weps)-1);
       f=0;
       do i = 1 to nrow(w);
-      if (w > weps) then
+      if (w[i] > weps) then
          vdw = v[i]/w[i];
       else 
          vdw = v[i]/weps;
@@ -1265,7 +1265,7 @@ proc iml;
       verybig= weps**(log(weps)-1);
       f=0;
       do i = 1 to nrow(w);
-      if (w > weps) then
+      if (w[i] > weps) then
          vdw = v[i]/w[i];
       else 
          vdw = v[i]/weps;
