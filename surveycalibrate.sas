@@ -1,8 +1,8 @@
 
 /*--------------------------------------------------------------------
 
-Author: Tony An, SAS Institute Inc. 
-        tony.an@sas.com
+Author: Tony An, Ph.D. 
+        anthony.b.an@gmail.com
 
 In survey sampling, calibration is commonly used for adjusting weights
 to ensure that estimates for covariates in the sample match known
@@ -21,7 +21,7 @@ specified calibration method.
 ----------------------------------------------------------------------
  DISCLAIMER:
 
-       THIS INFORMATION IS PROVIDED BY SAS INSTITUTE INC. AS A SERVICE
+       THIS INFORMATION IS PROVIDED BY THE AUTHOR. AS A SERVICE
  TO ITS USERS.  IT IS PROVIDED "AS IS".  THERE ARE NO WARRANTIES,
  EXPRESSED OR IMPLIED, AS TO MERCHANTABILITY OR FITNESS FOR A
  PARTICULAR PURPOSE REGARDING THE ACCURACY OF THE MATERIALS OR CODE
