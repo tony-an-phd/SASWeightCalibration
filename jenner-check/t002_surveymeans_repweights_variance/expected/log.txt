@@ -1,0 +1,18 @@
+NOTE: Option OBS changed to 100.
+NOTE: DATA Mortality
+
+NOTE: Processing inline DATALINES (20 lines)
+
+NOTE: Read 20 rows from DATALINES.
+NOTE: Wrote Mortality (20 rows, 12 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC PRINT data=Mortality
+
+NOTE: PROC PRINT completed: 10 observations printed, 12 variables
+NOTE: PROC SURVEYMEANS data=Mortality
+
+NOTE: Using Python scipy version 1.16.3
+NOTE: ODS plot written: surveymeans_ci.spec.json
+NOTE: PROC SURVEYMEANS completed.

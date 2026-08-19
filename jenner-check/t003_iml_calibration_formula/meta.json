@@ -1,0 +1,7 @@
+{
+  "bundle": "t003_iml_calibration_formula",
+  "source_file": "surveycalibrate.sas",
+  "source_blob_sha": "b7076cc8fff3d7a62c899fb2bbbc9da1d95a2509",
+  "source_commit": "75d1740d09cdb5ef7a2984afb869d82ec8e1516a",
+  "notes": "Excerpted from the %SurveyCalibrate macro's %NONE calibration branch (surveycalibrate.sas lines 337-389): the core generalized-least-squares calibration weight formula (CalW = w + w#(X*beta), beta = ginv(X'*wx)*(T-X'*w)) run directly in PROC IML against the repo's own Mortality data and control totals. The macro's CALL SYMPUTX bookkeeping (writing status back to the wrapping %macro) is omitted since this bundle calls the IML math directly; that same construct is the subject of a filed regression test since the hosted engine does not yet support CALL SYMPUTX inside PROC IML."
+}

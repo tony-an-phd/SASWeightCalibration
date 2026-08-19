@@ -1,0 +1,7 @@
+{
+  "bundle": "t002_surveymeans_repweights_variance",
+  "source_file": "TonyAnSGF2020_sample.sas",
+  "source_blob_sha": "5243f0ce3a387780a7a345ca03a354b431b9d8c3",
+  "source_commit": "75d1740d09cdb5ef7a2984afb869d82ec8e1516a",
+  "notes": "The sample script's final PROC SURVEYMEANS analysis step, adapted to supply replicate weight columns directly via REPWEIGHTS= (the macro's own user-supplied-replicate-weights mode, surveycalibrate.sas lines 302-309) instead of through the macro's internal VARMETHOD=BOOTSTRAP/OUTWEIGHTS= generation path, which the hosted engine does not yet support end-to-end (see filed regression tests). Same PROC, same REPWEIGHTS technique, same Mortality data shape as the original."
+}

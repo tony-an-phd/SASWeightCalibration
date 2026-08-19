@@ -1,0 +1,7 @@
+{
+  "bundle": "t001_surveymeans_design_summary",
+  "source_file": "TonyAnSGF2020_sample.sas",
+  "source_blob_sha": "5243f0ce3a387780a7a345ca03a354b431b9d8c3",
+  "source_commit": "75d1740d09cdb5ef7a2984afb869d82ec8e1516a",
+  "notes": "First half of the sample script's own flow: prints and PROC SURVEYMEANS design-based summaries (sum, then stratified/clustered mean) of the repo's public SGF 2020 Mortality survey extract, trimmed to 30 rows. Runs unmodified from the sample script's structure and column names."
+}
